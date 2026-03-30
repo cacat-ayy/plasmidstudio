@@ -293,6 +293,7 @@ html.dark .nav { background: rgba(15,23,42,.85); }
 html.dark .nav.nav-scrolled { box-shadow: 0 2px 16px rgba(0,0,0,.3); }
 html.dark .hero { background: linear-gradient(180deg, rgba(99,102,241,.08) 0%, var(--bg) 100%); }
 html.dark .example-visual { background: linear-gradient(135deg, #1a1f35, #1e293b); }
+html.dark .example-visual img { background: #fff; border-radius: 12px; padding: 12px; }
 html.dark .cta-banner { background: linear-gradient(135deg, #312e81, #4c1d95); }
 html.dark .btn-white { background: #e2e8f0; color: #312e81; }
 html.dark .btn-white:hover { background: #fff; }
