@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offline – PlasmidStudio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='12' fill='none' stroke='%236366f1' stroke-width='2.5'/><path d='M8 14a6 6 0 0 1 12 0' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round'/><circle cx='14' cy='14' r='2.5' fill='%236366f1'/></svg>">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1e293b; background: #f0f2f5;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 24px; text-align: center;
+  -webkit-font-smoothing: antialiased;
+}
+.card {
+  max-width: 420px; background: #fff; border-radius: 16px;
+  padding: 48px 32px; box-shadow: 0 4px 24px rgba(0,0,0,.06);
+}
+.icon { margin-bottom: 20px; color: #94a3b8; }
+h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; letter-spacing: -.3px; }
+p { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 24px; font-size: 14px; font-weight: 600;
+  background: #6366f1; color: #fff; border-radius: 10px;
+  text-decoration: none; transition: background .2s;
+}
+a:hover { background: #4f46e5; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="1" y1="1" x2="23" y2="23"/>
+      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+      <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+      <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+      <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+      <line x1="12" y1="20" x2="12.01" y2="20"/>
+    </svg>
+  </div>
+  <h1>You're offline</h1>
+  <p>This page isn't available offline. Check your connection and try again. The editor may still work if it was previously loaded.</p>
+  <a href="app.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+    Try the Editor
+  </a>
+</div>
+</body>
+</html>

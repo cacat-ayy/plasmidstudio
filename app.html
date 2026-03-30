@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlasmidStudio – Plasmid Map Editor</title>
+<meta name="description" content="Interactive plasmid map editor. Design circular and linear vector maps, import GenBank files, and export publication-ready SVG, PNG, and PDF.">
+<meta name="keywords" content="plasmid map editor, circular map, linear map, GenBank import, SVG export, molecular cloning, vector design">
+<meta name="author" content="PlasmidStudio">
+<meta name="theme-color" content="#6366f1">
+<script>if(location.protocol!=='file:')document.head.insertAdjacentHTML('beforeend','<link rel="manifest" href="manifest.json">');</script>
+<link rel="canonical" href="https://plasmidstudio.app/app.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='12' fill='none' stroke='%236366f1' stroke-width='2.5'/><path d='M8 14a6 6 0 0 1 12 0' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round'/><circle cx='14' cy='14' r='2.5' fill='%236366f1'/></svg>">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://plasmidstudio.app/app.html">
+<meta property="og:title" content="PlasmidStudio – Plasmid Map Editor">
+<meta property="og:description" content="Interactive plasmid map editor. Design circular and linear vector maps, import GenBank files, and export publication-ready SVG, PNG, and PDF.">
+<meta property="og:image" content="https://plasmidstudio.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="PlasmidStudio">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PlasmidStudio – Plasmid Map Editor">
+<meta name="twitter:description" content="Interactive plasmid map editor. Design circular and linear vector maps, import GenBank files, and export publication-ready SVG, PNG, and PDF.">
+<meta name="twitter:image" content="https://plasmidstudio.app/og-image.png">
+
+<link rel="stylesheet" href="plasmid.css">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "PlasmidStudio",
+  "url": "https://plasmidstudio.app/app.html",
+  "applicationCategory": "ScienceApplication",
+  "operatingSystem": "Any (Web Browser)",
+  "browserRequirements": "Requires a modern browser with SVG and ES6 support",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Interactive plasmid map editor. Design circular and linear vector maps, import GenBank files, and export publication-ready SVG, PNG, and PDF.",
+  "screenshot": "https://plasmidstudio.app/og-image.png"
+}
+</script>
+</head>
+<body>
+<div id="app-loader">
+  <div class="loader-panel"></div>
+  <div class="loader-map">
+    <div class="loader-ring"></div>
+  </div>
+</div>
+<main role="application">
+<div id="panel" class="no-transitions">
+  <h2><a href="index.html" class="panel-home" title="Back to home" aria-label="Back to home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></a>Plasmid Editor</h2>
+
+  <!-- Top: Plasmid settings + Add feature -->
+  <div class="panel-top">
+    <div class="section">
+      <h3 class="collapsible" data-target="plasmid-body">Plasmid</h3>
+      <div class="section-body" id="plasmid-body">
+        <input type="hidden" id="plasmid-name" value="pUC19" maxlength="80">
+        <div class="input-tabs" id="input-tabs">
+          <button class="active" data-mode="length">Length (bp)</button>
+          <button data-mode="sequence">Sequence</button>
+        </div>
+        <div id="mode-length" class="input-mode active">
+          <input type="number" id="seq-length" value="2686" min="1" aria-label="Sequence length in base pairs">
+        </div>
+        <div id="mode-sequence" class="input-mode">
+          <textarea id="seq-input" rows="4" placeholder="Paste ATCG sequence..." aria-label="DNA sequence"></textarea>
+          <div id="seq-info" style="font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:8px"></div>
+        </div>
+        <label for="radius-slider">Radius</label>
+        <div class="slider-num-row">
+          <input type="range" id="radius-slider" min="80" max="280" value="220">
+          <input type="number" id="radius-num" min="80" max="280" value="220" aria-label="Radius value">
+        </div>
+        <label for="rotation-slider">Rotation</label>
+        <div class="slider-num-row">
+          <input type="range" id="rotation-slider" min="0" max="359" value="0">
+          <input type="number" id="rotation-num" min="0" max="359" value="0" aria-label="Rotation value">
+          <button class="btn-reset-rotation" id="rotation-reset" title="Reset rotation">↺</button>
+        </div>
+        <div id="linear-opts" style="display:none">
+          <label>Base pairs per row <span style="font-weight:400;color:var(--text-muted)">(0 = single row)</span></label>
+          <input type="number" id="linear-bp-per-row" min="0" step="100" value="0" style="width:100%" aria-label="Base pairs per row">
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="gc-section">
+      <h3 class="collapsible collapsed" data-target="gc-track-body">GC Content Track<span class="gc-disabled-hint" style="display:none">Requires a sequence</span></h3>
+      <div class="section-body collapsed" id="gc-track-body">
+        <div class="check-row">
+          <input type="checkbox" id="gc-show">
+          <label for="gc-show">Show GC track</label>
+        </div>
+        <label>Window size (bp)</label>
+        <input type="number" id="gc-window" min="10" max="500" value="50">
+        <div class="two-col">
+          <div>
+            <label>Height (px)</label>
+            <input type="number" id="gc-height" min="10" max="80" value="30">
+          </div>
+          <div>
+            <label>Opacity</label>
+            <input type="number" id="gc-opacity" min="0" max="100" value="50">
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <label>Above avg</label>
+            <input type="color" id="gc-color-above" value="#22c55e">
+          </div>
+          <div>
+            <label>Below avg</label>
+            <input type="color" id="gc-color-below" value="#ef4444">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: Tabbed Features / Markers -->
+  <div class="panel-bottom">
+    <div class="panel-tabs" id="panel-tabs">
+      <button class="active" data-tab="features-tab">Features</button>
+      <button data-tab="markers-tab">Markers</button>
+    </div>
+    <div class="tab-pane active" id="features-tab">
+      <div class="section" id="add-panel">
+        <h3 class="collapsible" data-target="add-feature-body">Add Feature</h3>
+        <div class="section-body" id="add-feature-body">
+          <label>Name</label>
+          <input type="text" id="f-name" placeholder="e.g. lacZ" maxlength="60">
+          <label>Type</label>
+          <select id="f-type">
+            <option value="gene">Gene / CDS</option>
+            <option value="promoter">Promoter</option>
+            <option value="terminator">Terminator</option>
+            <option value="origin">Origin of Replication</option>
+            <option value="resistance">Resistance Marker</option>
+            <option value="regulatory">Regulatory</option>
+            <option value="primer">Primer Binding Site</option>
+            <option value="misc">Misc Feature</option>
+          </select>
+          <div class="two-col">
+            <div><label>Start (bp)</label><input type="number" id="f-start" min="1" value="1"></div>
+            <div><label>End (bp)</label><input type="number" id="f-end" min="1" value="500"></div>
+          </div>
+          <label>Direction</label>
+          <div class="dir-toggle" id="add-dir-toggle">
+            <button class="active" data-dir="1">&#10145; Fwd</button>
+            <button data-dir="0">&#9644; None</button>
+            <button data-dir="-1">&#11013; Rev</button>
+          </div>
+          <label>Track</label>
+          <select id="f-track">
+            <option value="-2">Inner 2</option>
+            <option value="-1">Inner 1</option>
+            <option value="0" selected>Backbone</option>
+            <option value="1">Outer 1</option>
+            <option value="2">Outer 2</option>
+          </select>
+          <label>Color</label>
+          <div class="color-row" id="color-picker"></div>
+          <div id="add-error" class="error-msg" style="display:none"></div>
+          <button class="btn-primary" id="add-feature-btn">Add Feature</button>
+        </div>
+      </div>
+      <div id="feature-search-wrap" class="feature-search" style="display:none">
+        <svg class="feature-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="feature-search" placeholder="Filter features…" aria-label="Filter features">
+        <button id="feature-search-clear" class="feature-search-clear" aria-label="Clear filter">&times;</button>
+      </div>
+      <div class="section">
+        <ul id="feature-list" class="item-list" role="list" aria-label="Features"></ul>
+      </div>
+    </div>
+    <div class="tab-pane" id="markers-tab">
+      <div class="section" id="add-marker-panel">
+        <h3 class="collapsible" data-target="add-marker-body">Add Marker</h3>
+        <div class="section-body" id="add-marker-body">
+          <label>Name</label>
+          <input type="text" id="m-name" placeholder="e.g. EcoRI" maxlength="60">
+          <div class="two-col">
+            <div><label>Position (bp)</label><input type="number" id="m-pos" min="1" value="1"></div>
+            <div><label>Color</label><input type="color" id="m-color" value="#dc2626"></div>
+          </div>
+          <div class="two-col">
+            <div class="check-row"><input type="checkbox" id="m-outer" checked><label for="m-outer">Outer label</label></div>
+            <div class="check-row"><input type="checkbox" id="m-inner" checked><label for="m-inner">Inner label</label></div>
+          </div>
+          <div id="add-marker-error" class="error-msg" style="display:none"></div>
+          <button class="btn-primary" id="add-marker-btn">Add Marker</button>
+          <div class="re-divider" id="re-divider" style="display:none"><span>or</span></div>
+          <button class="btn-secondary" id="open-re-finder" style="display:none" title="Search for restriction enzyme cut sites in the sequence">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Find Restriction Sites
+          </button>
+        </div>
+      </div>
+      <div class="section">
+        <div id="marker-list-actions" class="list-actions" style="display:none">
+          <button id="bulk-marker-btn" class="btn-sm btn-secondary" title="Style all markers at once"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Style all</button>
+          <button id="bulk-re-btn" class="btn-sm btn-secondary" title="Style restriction enzyme markers only" style="display:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>Style RE</button>
+        </div>
+        <ul id="marker-list" class="item-list" role="list" aria-label="Markers"></ul>
+      </div>
+    </div>
+  </div>
+  <!-- Restriction Enzyme Finder (inline panel) -->
+  <div id="re-panel" class="re-panel" style="display:none">
+    <div class="re-panel-header">
+      <button id="re-panel-back" class="re-panel-back" aria-label="Back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span>Restriction Sites</span>
+    </div>
+    <div class="re-controls">
+      <input type="text" id="re-search" placeholder="Search enzyme name or sequence..." autocomplete="off" spellcheck="false">
+      <div class="re-filter-row">
+        <label for="re-cut-filter">Filter</label>
+        <select id="re-cut-filter">
+          <option value="all">All enzymes</option>
+          <option value="0">No cuts</option>
+          <option value="1">Single cutters</option>
+          <option value="2">Double cutters</option>
+          <option value="3">≤ 3 cuts</option>
+          <option value="6">≤ 6 cuts</option>
+        </select>
+        <button class="btn-sm re-add-selected" id="re-add-selected" disabled>Add selected</button>
+      </div>
+    </div>
+    <div class="re-table-wrap">
+      <table class="re-table">
+        <thead>
+          <tr>
+            <th class="re-th-check"><input type="checkbox" id="re-select-all" aria-label="Select all"></th>
+            <th>Enzyme</th>
+            <th>Recognition</th>
+            <th>Overhang</th>
+            <th>Cuts</th>
+            <th>Cut sites</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="re-results"></tbody>
+      </table>
+      <div id="re-empty" class="re-empty" style="display:none">No enzymes match your search.</div>
+    </div>
+    <div class="re-footer">
+      <span id="re-summary">0 enzymes shown</span>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <button id="tips-toggle">Tips</button>
+    <span class="footer-sep">&middot;</span>
+    <span>MIT License</span>
+    <span class="footer-sep">&middot;</span>
+    <button id="panel-cite-link">Cite this tool</button>
+    <div id="tips-card" class="tips-card" role="dialog" aria-label="Tips">
+      <div class="popover-header">
+        <span id="tips-counter">1 / 13</span>
+        <button id="tips-dismiss" aria-label="Close">&times;</button>
+      </div>
+      <div class="tips-body">
+        <div id="tips-title" class="tips-title"></div>
+        <div id="tips-text" class="tips-text"></div>
+      </div>
+      <div class="tips-nav">
+        <button id="tips-prev" aria-label="Previous tip">&larr;</button>
+        <button id="tips-next" aria-label="Next tip">&rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="panel-overlay" class="panel-overlay"></div>
+<div id="map-container">
+  <div id="map-drop-overlay" class="map-drop-overlay">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Drop file to import</span>
+  </div>
+  <button id="panel-toggle" class="panel-toggle" aria-label="Toggle panel">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="empty-state-overlay">
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+      <circle cx="40" cy="40" r="28" stroke="var(--border-light, #d1d5db)" stroke-width="4"/>
+      <path d="M40 12a28 28 0 0 1 24.2 14" stroke="var(--accent, #6366f1)" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <p>No plasmids open</p>
+    <button class="empty-state-btn" id="empty-new-btn">+ New Plasmid</button>
+    <p class="empty-state-hint">or drag &amp; drop a file anywhere</p>
+  </div>
+  <div id="toolbar">
+    <button id="tab-scroll-left" class="tab-scroll-btn" aria-label="Scroll tabs left" style="display:none"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6.5 1.5 3 5 6.5 8.5"/></svg></button>
+    <div id="tab-list"></div>
+    <button id="tab-scroll-right" class="tab-scroll-btn" aria-label="Scroll tabs right" style="display:none"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3.5 1.5 7 5 3.5 8.5"/></svg></button>
+    <button id="tab-add" title="New plasmid" aria-label="New plasmid">+</button>
+    <div class="toolbar-spacer"></div>
+    <button id="toolbar-bp" class="toolbar-bp" title="Plasmid statistics" aria-label="Plasmid statistics" aria-haspopup="true"></button>
+    <div class="toolbar-divider"></div>
+    <button class="toolbar-btn" id="toolbar-undo" title="Undo (Ctrl+Z)" aria-label="Undo" disabled>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+    </button>
+    <button class="toolbar-btn" id="toolbar-redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo" disabled>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"></path></svg>
+    </button>
+    <div class="toolbar-divider"></div>
+    <button class="toolbar-btn" id="toolbar-view-toggle" title="Toggle circular / linear view (L)" aria-label="Toggle circular or linear view">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="17" y2="12"/><line x1="3" y1="18" x2="14" y2="18"/></svg>
+    </button>
+    <button class="toolbar-btn" id="toolbar-pan-toggle" title="Toggle zoom & pan mode" aria-label="Toggle zoom and pan">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l-3 3-3-3"/><path d="M19 9l3 3-3 3"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+    </button>
+    <button class="toolbar-btn" id="toolbar-pan-reset" title="Reset zoom & pan" aria-label="Reset zoom and pan" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/><polyline points="1 20 1 14 7 14"/></svg>
+    </button>
+    <span class="toolbar-overflow-items">
+    <button class="toolbar-btn" id="open-style-themes" title="Feature Styles" aria-label="Feature style themes">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+    </button>
+    <div class="toolbar-divider"></div>
+    <button class="toolbar-btn" id="toolbar-theme" title="Theme" aria-label="Change theme" aria-haspopup="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18" fill="currentColor" opacity=".25"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+    </button>
+    <button class="toolbar-btn" id="toolbar-info" title="Information" aria-label="About PlasmidStudio" aria-haspopup="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+    </button>
+    </span>
+    <button class="toolbar-btn" id="toolbar-overflow-btn" title="More" aria-label="More options" aria-haspopup="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+    </button>
+    <div class="toolbar-overflow-menu" id="toolbar-overflow-menu"></div>
+  </div>
+  <div id="plasmid-stats-popover" class="popover stats-popover" role="dialog" aria-label="Plasmid Statistics" style="display:none">
+    <div class="popover-header"><span>Plasmid Statistics</span><button id="stats-close" aria-label="Close">&times;</button></div>
+    <div class="popover-body" id="stats-body"></div>
+  </div>
+  <div id="theme-popover" role="dialog" aria-label="Theme selector">
+    <div class="popover-header">
+      <span>Theme</span>
+      <button id="theme-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="theme-popover-body">
+      <div class="theme-group-label">Light</div>
+      <button class="theme-option active" data-pick-theme="light">
+        <span class="theme-preview" style="background:#f0f2f5">
+          <span class="tp-card" style="background:#ffffff">
+            <span class="tp-accent" style="background:#6366f1"></span>
+            <span class="tp-line" style="background:#1e293b"></span>
+            <span class="tp-line short" style="background:#94a3b8"></span>
+          </span>
+        </span>
+        <span class="theme-label">Light</span>
+      </button>
+      <button class="theme-option" data-pick-theme="solarized">
+        <span class="theme-preview" style="background:#eee8d5">
+          <span class="tp-card" style="background:#fdf6e3">
+            <span class="tp-accent" style="background:#268bd2"></span>
+            <span class="tp-line" style="background:#002b36"></span>
+            <span class="tp-line short" style="background:#93a1a1"></span>
+          </span>
+        </span>
+        <span class="theme-label">Solarized</span>
+      </button>
+      <button class="theme-option" data-pick-theme="nature">
+        <span class="theme-preview" style="background:#ecf5ec">
+          <span class="tp-card" style="background:#f8fcf8">
+            <span class="tp-accent" style="background:#16a34a"></span>
+            <span class="tp-line" style="background:#14532d"></span>
+            <span class="tp-line short" style="background:#86a892"></span>
+          </span>
+        </span>
+        <span class="theme-label">Nature</span>
+      </button>
+      <button class="theme-option" data-pick-theme="rose">
+        <span class="theme-preview" style="background:#f8f0f3">
+          <span class="tp-card" style="background:#fffbfc">
+            <span class="tp-accent" style="background:#e11d48"></span>
+            <span class="tp-line" style="background:#1c1017"></span>
+            <span class="tp-line short" style="background:#a8929c"></span>
+          </span>
+        </span>
+        <span class="theme-label">Rose</span>
+      </button>
+      <button class="theme-option" data-pick-theme="lavender">
+        <span class="theme-preview" style="background:#f0ecf9">
+          <span class="tp-card" style="background:#faf8ff">
+            <span class="tp-accent" style="background:#7c3aed"></span>
+            <span class="tp-line" style="background:#2e1065"></span>
+            <span class="tp-line short" style="background:#a393bf"></span>
+          </span>
+        </span>
+        <span class="theme-label">Lavender</span>
+      </button>
+      <div class="theme-group-label">Dark</div>
+      <button class="theme-option" data-pick-theme="dark">
+        <span class="theme-preview" style="background:#0f172a">
+          <span class="tp-card" style="background:#1e293b">
+            <span class="tp-accent" style="background:#818cf8"></span>
+            <span class="tp-line" style="background:#f1f5f9"></span>
+            <span class="tp-line short" style="background:#64748b"></span>
+          </span>
+        </span>
+        <span class="theme-label">Dark</span>
+      </button>
+      <button class="theme-option" data-pick-theme="midnight">
+        <span class="theme-preview" style="background:#020617">
+          <span class="tp-card" style="background:#0c1222">
+            <span class="tp-accent" style="background:#38bdf8"></span>
+            <span class="tp-line" style="background:#e0f2fe"></span>
+            <span class="tp-line short" style="background:#38bdf8"></span>
+          </span>
+        </span>
+        <span class="theme-label">Midnight</span>
+      </button>
+      <button class="theme-option" data-pick-theme="dracula">
+        <span class="theme-preview" style="background:#1e1f29">
+          <span class="tp-card" style="background:#282a36">
+            <span class="tp-accent" style="background:#bd93f9"></span>
+            <span class="tp-line" style="background:#f8f8f2"></span>
+            <span class="tp-line short" style="background:#6272a4"></span>
+          </span>
+        </span>
+        <span class="theme-label">Dracula</span>
+      </button>
+      <button class="theme-option" data-pick-theme="nord">
+        <span class="theme-preview" style="background:#242933">
+          <span class="tp-card" style="background:#2e3440">
+            <span class="tp-accent" style="background:#88c0d0"></span>
+            <span class="tp-line" style="background:#eceff4"></span>
+            <span class="tp-line short" style="background:#7b88a1"></span>
+          </span>
+        </span>
+        <span class="theme-label">Nord</span>
+      </button>
+      <button class="theme-option" data-pick-theme="catppuccin">
+        <span class="theme-preview" style="background:#11111b">
+          <span class="tp-card" style="background:#1e1e2e">
+            <span class="tp-accent" style="background:#cba6f7"></span>
+            <span class="tp-line" style="background:#cdd6f4"></span>
+            <span class="tp-line short" style="background:#6c7086"></span>
+          </span>
+        </span>
+        <span class="theme-label">Catppuccin</span>
+      </button>
+    </div>
+  </div>
+  <div id="info-popover" role="dialog" aria-label="About PlasmidStudio">
+    <div class="popover-header">
+      <span>About</span>
+      <button id="info-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="info-body">
+      <div class="info-logo">&#x1F9EC;</div>
+      <div class="info-title">PlasmidStudio</div>
+      <div class="info-version">v1.0.0</div>
+      <div class="info-desc">Interactive plasmid map editor. Build, annotate, and export publication-ready vector maps in your browser.</div>
+      <hr>
+      <div class="info-row"><span class="info-label">Author</span><span><a href="mailto:contact@plasmidstudio.app" style="color:var(--accent);text-decoration:none">Christopher Acatay</a></span></div>
+      <div class="info-row"><span class="info-label">License</span><span>MIT &ndash; free for any use</span></div>
+      <hr>
+      <div class="info-notice">
+        <strong>Free to use.</strong> PlasmidStudio is open-source under the MIT license. All generated figures may be used freely in publications, presentations, theses, and commercial work without restriction or fee.
+      </div>
+      <hr>
+      <div class="info-shortcuts-title">How to Cite</div>
+      <div class="info-cite">
+        Acatay, C. (2026). PlasmidStudio: an interactive plasmid map editor. Available at <a href="https://plasmidstudio.app" target="_blank">plasmidstudio.app</a>
+      </div>
+      <button class="info-copy-cite" id="copy-citation" title="Copy citation to clipboard">Copy citation</button>
+      <hr>
+      <div class="info-shortcuts-title info-collapsible collapsed" id="shortcuts-toggle">Keyboard Shortcuts <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="info-shortcuts-body collapsed" id="shortcuts-body">
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Z</kbd></span><span class="shortcut-desc">Undo</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></span><span class="shortcut-desc">Redo</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Y</kbd></span><span class="shortcut-desc">Redo</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>S</kbd></span><span class="shortcut-desc">Export</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Escape</kbd></span><span class="shortcut-desc">Deselect / close popover</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Delete</kbd></span><span class="shortcut-desc">Delete selected</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>+</kbd> / <kbd>-</kbd></span><span class="shortcut-desc">Move feature to outer / inner ring</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>L</kbd></span><span class="shortcut-desc">Toggle circular / linear view</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>R</kbd></span><span class="shortcut-desc">Reset map rotation</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>↑</kbd> / <kbd>↓</kbd></span><span class="shortcut-desc">Navigate feature / marker list</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Tab</kbd></span><span class="shortcut-desc">Switch between features and markers</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Enter</kbd></span><span class="shortcut-desc">Select / deselect focused item</span></div>
+        <div class="info-shortcut"><span class="shortcut-keys"><kbd>Space</kbd></span><span class="shortcut-desc">Toggle visibility of focused item</span></div>
+      </div>
+      <hr>
+      <button id="reset-onboarding" class="info-reset-onboarding">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Reset onboarding tips
+      </button>
+      <hr>
+      <div style="display:flex;gap:16px;font-size:12px">
+        <a href="impressum.html" target="_blank" style="color:var(--text-muted)">Impressum</a>
+        <a href="datenschutz.html" target="_blank" style="color:var(--text-muted)">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+  <svg id="plasmid-svg" width="900" height="900" viewBox="0 0 900 900" role="img" aria-label="Plasmid map"></svg>
+  <svg id="linear-svg" class="linear-svg" style="display:none"></svg>
+  <div id="center-edit-popover" class="popover-menu">
+    <div class="popover-header">
+      <span>Center Label</span>
+      <button id="cep-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="popover-body">
+      <div class="two-col">
+        <div class="check-row"><input type="checkbox" id="cep-show-name" checked><label for="cep-show-name">Show name</label></div>
+        <div class="check-row"><input type="checkbox" id="cep-show-length" checked><label for="cep-show-length">Show length</label></div>
+      </div>
+      <label>Length format</label>
+      <select id="cep-length-format">
+        <option value="auto">Auto (2.7 kb)</option>
+        <option value="bp">Base pairs (2686 bp)</option>
+        <option value="kb1">Kilobases (2.7 kb)</option>
+        <option value="kb0">Kilobases integer (3 kb)</option>
+      </select>
+      <hr style="border:none;border-top:1px solid var(--border-light);margin:8px 0">
+      <label>Name</label>
+      <input type="text" id="cep-name">
+      <div class="two-col">
+        <div>
+          <label>Name size</label>
+          <input type="number" id="cep-name-size" min="8" max="36" value="16">
+        </div>
+        <div>
+          <label>Color</label>
+          <input type="color" id="cep-name-color" value="#1e293b">
+        </div>
+      </div>
+      <label>Name font</label>
+      <select id="cep-name-font">
+        <option value="sans-serif">Sans-serif</option>
+        <option value="serif">Serif</option>
+        <option value="monospace">Monospace</option>
+        <option value="Arial">Arial</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Helvetica">Helvetica</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+      </select>
+      <hr style="border:none;border-top:1px solid var(--border-light);margin:8px 0">
+      <div class="two-col">
+        <div>
+          <label>Length size</label>
+          <input type="number" id="cep-len-size" min="8" max="30" value="13">
+        </div>
+        <div>
+          <label>Color</label>
+          <input type="color" id="cep-len-color" value="#64748b">
+        </div>
+      </div>
+      <label>Length font</label>
+      <select id="cep-len-font">
+        <option value="sans-serif">Sans-serif</option>
+        <option value="serif">Serif</option>
+        <option value="monospace">Monospace</option>
+        <option value="Arial">Arial</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Helvetica">Helvetica</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+      </select>
+    </div>
+  </div>
+  <div id="tooltip" role="tooltip">
+    <div class="tt-name"></div>
+    <div class="tt-meta"></div>
+    <div class="tt-range"></div>
+    <div class="tt-seq"></div>
+    <div class="tt-protein"></div>
+    <div class="tt-actions">
+      <button data-action="copy-seq">Copy Sequence</button>
+      <button data-action="copy-comp">Copy Complement</button>
+      <button data-action="copy-revcomp">Copy Rev. Complement</button>
+      <button data-action="copy-fasta">Copy as FASTA</button>
+      <button data-action="copy-protein">Copy Protein</button>
+      <button data-action="copy-name">Copy Name</button>
+      <button data-action="copy-range">Copy Range</button>
+      <hr>
+      <button data-action="duplicate">Duplicate</button>
+      <button data-action="toggle-vis">Hide</button>
+      <button data-action="delete" class="tt-action-danger">Delete</button>
+    </div>
+  </div>
+
+
+
+  <!-- Backbone context menu -->
+  <div id="bb-ctx-menu" class="popover-menu">
+    <div class="popover-header">
+      <span>Backbone</span>
+      <button id="bb-ctx-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="popover-body">
+      <label>Track width</label>
+      <div class="slider-num-row">
+        <input type="range" id="bb-width" min="6" max="60" value="28">
+        <input type="number" id="bb-width-num" min="6" max="60" value="28">
+      </div>
+      <div class="two-col">
+        <div><label>Fill</label><input type="color" id="bb-fill" value="#e2e8f0"></div>
+        <div><label>Edge</label><input type="color" id="bb-edge" value="#cbd5e1"></div>
+      </div>
+      <label>Edge width</label>
+      <div class="slider-num-row">
+        <input type="range" id="bb-edge-width" min="0" max="4" step="0.5" value="1" list="ticks-0-4">
+        <input type="number" id="bb-edge-width-num" min="0" max="4" step="0.5" value="1">
+      </div>
+      <label>Opacity</label>
+      <div class="slider-num-row">
+        <input type="range" id="bb-opacity" min="0" max="100" step="5" value="100" list="ticks-opacity">
+        <input type="number" id="bb-opacity-num" min="0" max="100" step="5" value="100">
+      </div>
+      <!-- Linear-only tick & label controls -->
+      <div id="bb-lin-tick-section" style="display:none">
+        <hr class="bulk-divider">
+        <div class="check-row">
+          <input type="checkbox" id="bb-lin-tick-show" checked>
+          <label for="bb-lin-tick-show">Tick marks</label>
+        </div>
+        <label>Interval (bp) <span class="hint">0 = auto</span></label>
+        <input type="number" id="bb-lin-tick-interval" min="0" value="0" placeholder="Auto">
+        <label>Width</label>
+        <div class="slider-num-row">
+          <input type="range" id="bb-lin-tick-width" min="0.5" max="4" step="0.5" value="1">
+          <input type="number" id="bb-lin-tick-width-num" min="0.5" max="4" step="0.5" value="1">
+        </div>
+        <label>Color</label>
+        <input type="color" id="bb-lin-tick-color" value="#94a3b8">
+        <div class="check-row">
+          <input type="checkbox" id="bb-lin-minor-show" checked>
+          <label for="bb-lin-minor-show">Minor ticks</label>
+        </div>
+        <hr class="bulk-divider">
+        <div class="check-row">
+          <input type="checkbox" id="bb-lin-label-show" checked>
+          <label for="bb-lin-label-show">Labels</label>
+        </div>
+        <label>Label format</label>
+        <div class="dir-toggle" id="bb-lin-label-format">
+          <button class="active" data-fmt="short">2.5k</button>
+          <button data-fmt="full">2500</button>
+        </div>
+        <label>Label size</label>
+        <div class="slider-num-row">
+          <input type="range" id="bb-lin-label-size" min="6" max="16" value="9">
+          <input type="number" id="bb-lin-label-size-num" min="6" max="16" value="9">
+        </div>
+        <label>Label color</label>
+        <input type="color" id="bb-lin-label-color" value="#64748b">
+      </div>
+    </div>
+  </div>
+
+  <!-- Ring style context menu -->
+  <div id="ring-ctx-menu" class="popover-menu">
+    <div class="popover-header">
+      <span id="ring-ctx-title">Ring</span>
+      <button id="ring-ctx-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="popover-body">
+      <label>Track width</label>
+      <div class="slider-num-row">
+        <input type="range" id="ring-width" min="6" max="60" value="24">
+        <input type="number" id="ring-width-num" min="6" max="60" value="24">
+      </div>
+      <div class="two-col">
+        <div><label>Fill</label><input type="color" id="ring-fill" value="#e2e8f0"></div>
+        <div><label>Edge</label><input type="color" id="ring-edge" value="#cbd5e1"></div>
+      </div>
+      <label>Edge width</label>
+      <div class="slider-num-row">
+        <input type="range" id="ring-edge-width" min="0" max="4" step="0.5" value="1" list="ticks-0-4">
+        <input type="number" id="ring-edge-width-num" min="0" max="4" step="0.5" value="1">
+      </div>
+      <label>Opacity</label>
+      <div class="slider-num-row">
+        <input type="range" id="ring-opacity" min="0" max="100" step="5" value="40" list="ticks-opacity">
+        <input type="number" id="ring-opacity-num" min="0" max="100" step="5" value="40">
+      </div>
+      <button id="ring-reset-style" class="btn-reset-rotation" style="width:100%;height:auto;padding:6px;font-size:11px;margin-top:6px">Reset to backbone style</button>
+    </div>
+  </div>
+
+  <!-- Tick context menu -->
+  <div id="tick-ctx-menu" class="popover-menu">
+    <div class="popover-header">
+      <span>Tick Marks</span>
+      <button id="tick-ctx-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="popover-tabs" id="tick-ctx-tabs">
+      <button class="active" data-tick-tab="tick-major-tab">Major</button>
+      <button data-tick-tab="tick-minor-tab">Minor</button>
+    </div>
+    <div class="popover-tab-pane active" id="tick-major-tab">
+      <div class="check-row">
+        <input type="checkbox" id="tick-major-show" checked>
+        <label for="tick-major-show">Enable major ticks</label>
+      </div>
+      <label>Direction</label>
+      <select id="tick-major-direction">
+        <option value="out">Outward</option>
+        <option value="in">Inward</option>
+        <option value="both">Centered</option>
+        <option value="outandin">Both (outside &amp; inside)</option>
+      </select>
+      <label>Interval (bp) <span class="hint">0 = auto</span></label>
+      <input type="number" id="tick-major-interval" min="0" value="0" placeholder="Auto">
+      <label>Length</label>
+      <div class="slider-num-row">
+        <input type="range" id="tick-major-len" min="2" max="20" value="8">
+        <input type="number" id="tick-major-len-num" min="2" max="20" value="8">
+      </div>
+      <label>Width</label>
+      <div class="slider-num-row">
+        <input type="range" id="tick-major-width" min="0.5" max="4" step="0.5" value="1.5" list="ticks-05-4">
+        <input type="number" id="tick-major-width-num" min="0.5" max="4" step="0.5" value="1.5">
+      </div>
+      <div class="two-col">
+        <div>
+          <label>Color</label>
+          <input type="color" id="tick-major-color" value="#94a3b8">
+        </div>
+        <div>
+          <label>Label color</label>
+          <input type="color" id="tick-label-color" value="#64748b">
+        </div>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="tick-major-labels" checked>
+        <label for="tick-major-labels">Show labels</label>
+      </div>
+      <label>Label format</label>
+      <div class="dir-toggle" id="tick-label-format">
+        <button class="active" data-fmt="short">2.5k</button>
+        <button data-fmt="full">2500</button>
+      </div>
+      <label>Label size</label>
+      <div class="slider-num-row">
+        <input type="range" id="tick-label-size" min="6" max="16" value="10">
+        <input type="number" id="tick-label-size-num" min="6" max="16" value="10">
+      </div>
+    </div>
+    <div class="popover-tab-pane" id="tick-minor-tab">
+      <div class="check-row">
+        <input type="checkbox" id="tick-minor-show" checked>
+        <label for="tick-minor-show">Enable minor ticks</label>
+      </div>
+      <label>Direction</label>
+      <select id="tick-minor-direction">
+        <option value="out">Outward</option>
+        <option value="in">Inward</option>
+        <option value="both">Centered</option>
+        <option value="outandin">Both (outside &amp; inside)</option>
+      </select>
+      <label>Interval (bp) <span class="hint">0 = auto</span></label>
+      <input type="number" id="tick-minor-interval" min="0" value="0" placeholder="Auto">
+      <label>Length</label>
+      <div class="slider-num-row">
+        <input type="range" id="tick-minor-len" min="1" max="14" value="4">
+        <input type="number" id="tick-minor-len-num" min="1" max="14" value="4">
+      </div>
+      <label>Width</label>
+      <div class="slider-num-row">
+        <input type="range" id="tick-minor-width" min="0.5" max="3" step="0.5" value="1" list="ticks-05-3">
+        <input type="number" id="tick-minor-width-num" min="0.5" max="3" step="0.5" value="1">
+      </div>
+      <div class="two-col">
+        <div>
+          <label>Color</label>
+          <input type="color" id="tick-minor-color" value="#cbd5e1">
+        </div>
+        <div>
+          <label>Label color</label>
+          <input type="color" id="tick-minor-label-color" value="#94a3b8">
+        </div>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="tick-minor-labels">
+        <label for="tick-minor-labels">Show labels</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export FAB + popover -->
+  <button id="export-fab" title="Export" aria-label="Export" aria-haspopup="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Export</span>
+  </button>
+  <div id="export-popover" role="dialog" aria-label="Export options">
+    <div class="popover-header">
+      <span>Export</span>
+      <button id="export-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="export-body">
+      <button class="export-option" id="export-svg-btn">
+        <div class="export-icon">SVG</div>
+        <div class="export-detail">
+          <div class="export-title">Vector (SVG)</div>
+          <div class="export-desc">Transparent background, scalable</div>
+        </div>
+      </button>
+      <hr>
+      <button class="export-option" id="export-png-btn">
+        <div class="export-icon">PNG</div>
+        <div class="export-detail">
+          <div class="export-title">Raster (PNG)</div>
+          <div class="export-desc">Bitmap image for documents</div>
+        </div>
+      </button>
+      <div class="export-png-opts">
+        <div class="check-row">
+          <input type="checkbox" id="png-bg" checked>
+          <label for="png-bg">White background</label>
+        </div>
+        <label>Scale</label>
+        <select id="png-scale">
+          <option value="1">1× (900px)</option>
+          <option value="2" selected>2× (1800px)</option>
+          <option value="3">3× (2700px)</option>
+          <option value="4">4× (3600px)</option>
+        </select>
+      </div>
+      <hr>
+      <button class="export-option" id="export-pdf-btn">
+        <div class="export-icon">PDF</div>
+        <div class="export-detail">
+          <div class="export-title">Document (PDF)</div>
+          <div class="export-desc">Vector-quality for publications</div>
+        </div>
+      </button>
+      <div class="export-pdf-opts">
+        <label>Page size</label>
+        <select id="pdf-page-size">
+          <option value="letter">Letter (8.5 × 11 in)</option>
+          <option value="a4" selected>A4 (210 × 297 mm)</option>
+          <option value="square">Square (fit to map)</option>
+        </select>
+        <div class="check-row">
+          <input type="checkbox" id="pdf-title" checked>
+          <label for="pdf-title">Include plasmid name</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="pdf-meta" checked>
+          <label for="pdf-meta">Include feature table</label>
+        </div>
+      </div>
+      <hr>
+      <button class="export-option" id="export-gb-btn">
+        <div class="export-icon">.gb</div>
+        <div class="export-detail">
+          <div class="export-title">GenBank</div>
+          <div class="export-desc">Standard format for sequence tools</div>
+        </div>
+      </button>
+      <hr>
+      <button class="export-option" id="export-json-btn">
+        <div class="export-icon">JSON</div>
+        <div class="export-detail">
+          <div class="export-title">Project File</div>
+          <div class="export-desc">Save as .json for later import</div>
+        </div>
+      </button>
+      <hr>
+      <button class="export-option" id="share-link-btn">
+        <div class="export-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+        <div class="export-detail">
+          <div class="export-title">Share Link</div>
+          <div class="export-desc">Copy a URL that recreates this plasmid</div>
+        </div>
+      </button>
+      <input type="file" id="import-json-file" accept=".json,.gb,.gbk,.genbank,.fasta,.fa,.fna,.fsa,.dna" style="display:none">
+    </div>
+  </div>
+  <!-- Minimap -->
+  <div id="minimap">
+    <canvas id="minimap-canvas"></canvas>
+    <div id="minimap-viewport"></div>
+  </div>
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Feature list context menu -->
+  <div id="feat-ctx-menu" class="tab-ctx-menu">
+    <button id="feat-ctx-style-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><span id="feat-ctx-style-label">Style all genes</span></button>
+    <button id="feat-ctx-hide-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span id="feat-ctx-hide-label">Hide all genes</span></button>
+    <button id="feat-ctx-select"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Select</button>
+    <hr class="ctx-divider"/>
+    <button id="feat-ctx-duplicate"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicate</button>
+    <button id="feat-ctx-delete" class="danger"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Delete</button>
+  </div>
+
+  <!-- Bulk style by type popover -->
+  <div id="bulk-style-overlay" role="dialog" aria-modal="true" aria-label="Style by type">
+    <div class="bulk-style-dialog" id="bulk-style-dialog">
+      <div class="bulk-style-header">
+        <h3 id="bulk-style-title">Style all genes</h3>
+        <span id="bulk-style-count" class="bulk-style-count">0 features</span>
+        <button id="bulk-style-close" class="bulk-style-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="bulk-style-body" id="bulk-style-body"></div>
+      <div class="bulk-style-footer">
+        <button id="bulk-style-cancel" class="btn-secondary">Cancel</button>
+        <button id="bulk-style-apply" class="btn-primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bulk-marker-overlay" role="dialog" aria-modal="true" aria-label="Style all markers">
+    <div class="bulk-style-dialog" id="bulk-marker-dialog">
+      <div class="bulk-style-header">
+        <h3 id="bulk-marker-title">Style all markers</h3>
+        <span id="bulk-marker-count" class="bulk-style-count">0 markers</span>
+        <button id="bulk-marker-close" class="bulk-style-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="bulk-style-body" id="bulk-marker-body"></div>
+      <div class="bulk-style-footer">
+        <button id="bulk-marker-cancel" class="btn-secondary">Cancel</button>
+        <button id="bulk-marker-apply" class="btn-primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab context menu -->
+  <div id="tab-ctx-menu" class="tab-ctx-menu">
+    <button id="tab-ctx-duplicate"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicate</button>
+    <button id="tab-ctx-close" class="danger"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Close</button>
+  </div>
+  <!-- Close Tab Confirm -->
+  <div id="close-confirm" class="close-confirm-popover">
+    <div class="close-confirm-text">Close <strong id="close-confirm-name"></strong>?</div>
+    <div class="close-confirm-hint">Unsaved changes will be lost.</div>
+    <div class="close-confirm-actions">
+      <button id="close-confirm-cancel">Cancel</button>
+      <button id="close-confirm-ok" class="danger">Close</button>
+    </div>
+  </div>
+  <!-- Generic confirm/alert dialog -->
+  <div id="confirm-overlay" class="confirm-overlay" role="dialog" aria-modal="true" aria-label="Confirmation">
+    <div class="confirm-dialog">
+      <div class="confirm-msg" id="confirm-msg"></div>
+      <div class="confirm-actions" id="confirm-actions">
+        <button id="confirm-cancel">Cancel</button>
+        <button id="confirm-ok" class="danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Style Theme Modal -->
+
+  <div id="style-theme-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Feature Style Themes">
+    <div class="modal-card style-theme-card">
+      <div class="modal-header">
+        <span>Feature Styles</span>
+        <button id="style-theme-close" aria-label="Close">&times;</button>
+      </div>
+      <p class="style-theme-hint">Apply a color and shape preset to all features based on their type. You can still customize individual features afterward.</p>
+      <div id="style-theme-grid" class="style-theme-grid"></div>
+    </div>
+  </div>
+
+  <!-- New Plasmid Modal -->
+  <div id="new-plasmid-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="New Plasmid">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span>New Plasmid</span>
+        <button id="new-modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <button class="modal-option" data-action="blank">
+          <div class="modal-option-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <div class="modal-option-detail">
+            <div class="modal-option-title">Blank</div>
+            <div class="modal-option-desc">Start with an empty 3 kb plasmid</div>
+          </div>
+        </button>
+        <hr>
+        <div class="modal-section-label">From Template</div>
+        <div class="modal-templates">
+          <button class="modal-template-btn" data-template="pUC19">
+            <span class="modal-tpl-name">pUC19</span>
+            <span class="modal-tpl-size">2,686 bp</span>
+          </button>
+          <button class="modal-template-btn" data-template="pBR322">
+            <span class="modal-tpl-name">pBR322</span>
+            <span class="modal-tpl-size">4,361 bp</span>
+          </button>
+          <button class="modal-template-btn" data-template="pET-28a">
+            <span class="modal-tpl-name">pET-28a(+)</span>
+            <span class="modal-tpl-size">5,369 bp</span>
+          </button>
+        </div>
+        <hr>
+        <button class="modal-option" data-action="import">
+          <div class="modal-option-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="modal-option-detail">
+            <div class="modal-option-title">Import File</div>
+            <div class="modal-option-desc">Open or drop .json, .gb, .fasta, or .dna file</div>
+          </div>
+        </button>
+        <div id="modal-drop-zone" class="modal-drop-zone">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Drop file here</span>
+        </div>
+        <hr>
+        <div class="modal-section-label">Fetch from Database</div>
+        <div class="modal-fetch-row">
+          <input type="text" id="fetch-accession" placeholder="NCBI accession or AddGene ID (e.g. M77789, 50005)" autocomplete="off">
+          <button id="fetch-accession-btn" class="modal-fetch-btn">Fetch</button>
+        </div>
+        <div id="fetch-status" class="modal-fetch-status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="walkthrough-overlay" class="walkthrough-overlay" aria-hidden="true">
+  <svg class="walkthrough-mask" width="100%" height="100%">
+    <defs>
+      <mask id="wt-mask">
+        <rect width="100%" height="100%" fill="white"/>
+        <rect id="wt-spotlight" rx="12" ry="12" fill="black"/>
+      </mask>
+    </defs>
+    <rect width="100%" height="100%" fill="rgba(0,0,0,.55)" mask="url(#wt-mask)"/>
+  </svg>
+  <div id="wt-tooltip" class="walkthrough-tooltip">
+    <div class="wt-header">
+      <span class="wt-icon" id="wt-icon"></span>
+      <div class="wt-header-text">
+        <h3 id="wt-title"></h3>
+        <p id="wt-desc"></p>
+      </div>
+    </div>
+    <div class="wt-footer">
+      <div class="wt-dots" id="wt-dots"></div>
+      <div class="wt-actions">
+        <button id="wt-skip" class="wt-btn-skip">Skip</button>
+        <button id="wt-next" class="wt-btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+<datalist id="ticks-opacity"><option value="0"><option value="5"><option value="10"><option value="15"><option value="20"><option value="25"><option value="30"><option value="35"><option value="40"><option value="45"><option value="50"><option value="55"><option value="60"><option value="65"><option value="70"><option value="75"><option value="80"><option value="85"><option value="90"><option value="95"><option value="100"></datalist>
+<datalist id="ticks-0-4"><option value="0"><option value="0.5"><option value="1"><option value="1.5"><option value="2"><option value="2.5"><option value="3"><option value="3.5"><option value="4"></datalist>
+<datalist id="ticks-05-4"><option value="0.5"><option value="1"><option value="1.5"><option value="2"><option value="2.5"><option value="3"><option value="3.5"><option value="4"></datalist>
+<datalist id="ticks-05-3"><option value="0.5"><option value="1"><option value="1.5"><option value="2"><option value="2.5"><option value="3"></datalist>
+<noscript><div style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:#f0f2f5;font-family:Inter,-apple-system,sans-serif;color:#1e293b;text-align:center;padding:24px"><div><h1 style="font-size:24px;margin-bottom:12px">JavaScript Required</h1><p style="color:#64748b;font-size:15px">PlasmidStudio needs JavaScript to run. Please enable it in your browser settings.</p></div></div></noscript>
+<script src="plasmid.js"></script>
+<script>if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+</body>
+</html>
