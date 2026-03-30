@@ -1,6 +1,6 @@
 // Cache version - update this when deploying new code.
 // Run: md5sum plasmid.js plasmid.css app.html index.html landing.css | md5sum | cut -c1-8
-const CACHE_VERSION = 'd130d42c';
+const CACHE_VERSION = '44883d31';
 const CACHE_NAME = 'plasmidstudio-' + CACHE_VERSION;
 const PRECACHE = [
   '/app.html',

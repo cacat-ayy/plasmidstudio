@@ -6480,6 +6480,7 @@
     const svg = $(isLinear ? 'linear-svg' : 'plasmid-svg');
     const clone = svg.cloneNode(true);
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.style.removeProperty('display');
     if (!isLinear) {
       if (tight) {
         // Compute bounding box, then build a square centered on the
