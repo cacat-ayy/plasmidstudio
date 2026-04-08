@@ -5205,12 +5205,17 @@
     }
   });
 
-  // Close expanded tooltip on outside click
-  document.addEventListener('mousedown', e => {
-    if (tooltipPinned && !tooltip.contains(e.target)) {
-      unpinTooltip();
+  // Close tooltip on outside click / tap
+  function _dismissTooltipOutside(e) {
+    if (tooltip.contains(e.target)) return;
+    if (tooltipPinned) { unpinTooltip(); return; }
+    // On touch devices, hide the hover tooltip when tapping empty space
+    if (!e.target.closest('.feature-arc') && !e.target.closest('.marker-group')) {
+      hideTooltip();
     }
-  });
+  }
+  document.addEventListener('mousedown', _dismissTooltipOutside);
+  document.addEventListener('touchstart', _dismissTooltipOutside, { passive: true });
 
   // --- Feature list ---
   let dragFromIdx = -1;
@@ -9318,6 +9323,8 @@
       panel.classList.contains('drawer-open') ? closeDrawer() : openDrawer();
     });
     if (overlay) overlay.addEventListener('click', closeDrawer);
+    const closeBtn = $('panel-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
 
     // Close drawer on Escape
     document.addEventListener('keydown', e => {
