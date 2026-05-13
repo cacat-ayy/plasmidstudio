@@ -49,13 +49,13 @@ landing.css        Landing page styles
 sw.js              Service worker for offline/PWA support
 manifest.json      PWA manifest
 offline.html       Offline / network-error fallback
-impressum.html     Legal notice (German, required by law)
-datenschutz.html   Privacy policy (German + English)
+impressum.html     Legal notice
+datenschutz.html   Privacy policy
 robots.txt         Crawler rules
 sitemap.xml        Sitemap
 fonts/             Self-hosted Inter (latin + latin-ext)
 icons/             PWA & favicon icons (SVG + PNG)
-examples/          Example plasmid maps (pUC19, HBV Genome)
+examples/          Example plasmid maps
 ```
 
 ## File Formats
