@@ -1,88 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"
+     font-family="Inter, system-ui, sans-serif">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f0b1a"/>
-      <stop offset="100%" stop-color="#1a1333"/>
-    </linearGradient>
-    <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#818cf8"/>
-      <stop offset="100%" stop-color="#6366f1"/>
-    </linearGradient>
+    <!-- Graph-paper graticule for the figure frame -->
+    <pattern id="graticule" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0V28M0 28H28" fill="none" stroke="#e9e5db" stroke-width="1"/>
+    </pattern>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Warm paper stock -->
+  <rect width="1200" height="630" fill="#fbfaf7"/>
 
-  <!-- Subtle grid dots -->
-  <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-    <circle cx="20" cy="20" r="0.8" fill="#ffffff" opacity="0.06"/>
-  </pattern>
-  <rect width="1200" height="630" fill="url(#dots)"/>
-
-  <!-- Plasmid ring illustration (right side) -->
-  <g transform="translate(880, 315)">
-    <!-- Outer glow -->
-    <circle cx="0" cy="0" r="170" fill="none" stroke="#6366f1" stroke-width="1" opacity="0.15"/>
-    <circle cx="0" cy="0" r="200" fill="none" stroke="#6366f1" stroke-width="0.5" opacity="0.08"/>
-
-    <!-- Main backbone -->
-    <circle cx="0" cy="0" r="140" fill="none" stroke="#4b5563" stroke-width="6" opacity="0.4"/>
-
-    <!-- Feature arcs -->
-    <!-- Promoter (green, top-right) -->
-    <path d="M 98.99 -98.99 A 140 140 0 0 1 140 0" fill="none" stroke="#22c55e" stroke-width="14" stroke-linecap="round"/>
-
-    <!-- Gene (blue, right-bottom) -->
-    <path d="M 140 0 A 140 140 0 0 1 0 140" fill="none" stroke="#6366f1" stroke-width="14" stroke-linecap="round"/>
-
-    <!-- Resistance (amber, bottom-left) -->
-    <path d="M -49.5 131 A 140 140 0 0 1 -140 0" fill="none" stroke="#f59e0b" stroke-width="14" stroke-linecap="round"/>
-
-    <!-- Origin (red, top-left) -->
-    <path d="M -121.24 -70 A 140 140 0 0 1 -70 -121.24" fill="none" stroke="#ef4444" stroke-width="14" stroke-linecap="round"/>
-
-    <!-- Terminator (purple, top) -->
-    <path d="M -35 -135.56 A 140 140 0 0 1 35 -135.56" fill="none" stroke="#a855f7" stroke-width="14" stroke-linecap="round"/>
-
-    <!-- Inner tick marks -->
-    <line x1="0" y1="-115" x2="0" y2="-125" stroke="#9ca3af" stroke-width="1.5" opacity="0.5"/>
-    <line x1="115" y1="0" x2="125" y2="0" stroke="#9ca3af" stroke-width="1.5" opacity="0.5"/>
-    <line x1="0" y1="115" x2="0" y2="125" stroke="#9ca3af" stroke-width="1.5" opacity="0.5"/>
-    <line x1="-115" y1="0" x2="-125" y2="0" stroke="#9ca3af" stroke-width="1.5" opacity="0.5"/>
+  <!-- ============ Left column ============ -->
+  <g transform="translate(76, 74)">
+    <circle cx="14" cy="14" r="12" fill="none" stroke="#1a1917" stroke-width="2"/>
+    <path d="M8 14a6 6 0 0 1 12 0" fill="none" stroke="#1a1917" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="14" cy="14" r="2.5" fill="#c4451f"/>
+    <text x="38" y="21" font-size="20" font-weight="600" fill="#1a1917" letter-spacing="-0.3">Plasmid<tspan fill="#797569" font-weight="400">Studio</tspan></text>
   </g>
 
-  <!-- Text content (left side) -->
-  <g transform="translate(80, 200)">
-    <!-- Logo icon (matches favicon proportions) -->
-    <circle cx="18" cy="18" r="14" fill="none" stroke="#6366f1" stroke-width="2.5"/>
-    <path d="M11 18a7 7 0 0 1 14 0" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="18" cy="18" r="2.9" fill="#6366f1"/>
-
-    <!-- App name -->
-    <text x="44" y="25" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="600" fill="#c7d2fe" letter-spacing="1">PlasmidStudio</text>
-
-    <!-- Main title -->
-    <text x="0" y="100" font-family="Inter, system-ui, sans-serif" font-size="56" font-weight="800" fill="#ffffff">Interactive Plasmid</text>
-    <text x="0" y="165" font-family="Inter, system-ui, sans-serif" font-size="56" font-weight="800" fill="#ffffff">Map Editor</text>
-
-    <!-- Subtitle -->
-    <text x="0" y="220" font-family="Inter, system-ui, sans-serif" font-size="22" fill="#9ca3af">Design and export publication-ready plasmid maps</text>
-    <text x="0" y="250" font-family="Inter, system-ui, sans-serif" font-size="22" fill="#9ca3af">in your browser. No signup required.</text>
-
-    <!-- Tagline points -->
-    <circle cx="12" cy="298" r="3.5" fill="#22c55e" opacity="0.8"/>
-    <text x="24" y="303" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500" fill="#9ca3af">Free &amp; open-source</text>
-
-    <circle cx="212" cy="298" r="3.5" fill="#818cf8" opacity="0.8"/>
-    <text x="224" y="303" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500" fill="#9ca3af">Works offline</text>
-
-    <circle cx="372" cy="298" r="3.5" fill="#f59e0b" opacity="0.8"/>
-    <text x="384" y="303" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500" fill="#9ca3af">GenBank &amp; SnapGene</text>
+  <g transform="translate(76, 158)">
+    <circle cx="4" cy="-5" r="4" fill="#c4451f"/>
+    <text x="20" y="0" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="13"
+          font-weight="500" fill="#797569" letter-spacing="2">FREE TO USE &#183; OPEN SOURCE &#183; NO ACCOUNT</text>
   </g>
 
-  <!-- URL (bottom-right) -->
-  <text x="1120" y="598" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="500" fill="#6366f1" text-anchor="end" opacity="0.7">plasmidstudio.app</text>
+  <text x="76" y="248" font-size="64" font-weight="600" fill="#1a1917" letter-spacing="-2.4">Plasmid maps,</text>
+  <text x="76" y="316" font-size="64" font-weight="600" fill="#797569" letter-spacing="-2.4">drawn properly.</text>
 
-  <!-- Bottom accent line -->
-  <rect x="0" y="622" width="1200" height="8" fill="url(#ring-grad)"/>
+  <text x="76" y="374" font-size="21" fill="#57544e">A circular and linear map editor that runs</text>
+  <text x="76" y="404" font-size="21" fill="#57544e">entirely in your browser.</text>
+
+  <line x1="76" y1="444" x2="640" y2="444" stroke="#e4e0d6" stroke-width="1"/>
+  <text x="76"  y="472" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="12" font-weight="500" fill="#797569" letter-spacing="1.6">IMPORT</text>
+  <text x="188" y="472" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="13" fill="#57544e">GenBank &#183; FASTA &#183; SnapGene &#183; NCBI</text>
+  <line x1="76" y1="492" x2="640" y2="492" stroke="#e4e0d6" stroke-width="1"/>
+  <text x="76"  y="520" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="12" font-weight="500" fill="#797569" letter-spacing="1.6">EXPORT</text>
+  <text x="188" y="520" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="13" fill="#57544e">SVG &#183; PNG &#183; PDF &#183; GenBank</text>
+  <line x1="76" y1="540" x2="640" y2="540" stroke="#e4e0d6" stroke-width="1"/>
+
+  <!-- ============ Right figure frame ============ -->
+  <rect x="740" y="110" width="384" height="384" fill="#fdfcfa"/>
+  <rect x="740" y="110" width="384" height="384" fill="url(#graticule)"/>
+  <rect x="740" y="110" width="384" height="384" fill="none" stroke="#e4e0d6" stroke-width="1"/>
+
+  <g fill="none" stroke="#1a1917" stroke-width="2">
+    <path d="M740 124V110h14"/>
+    <path d="M1110 110h14v14"/>
+    <path d="M740 480v14h14"/>
+    <path d="M1110 494h14v-14"/>
+  </g>
+
+  <g transform="translate(932, 302)">
+    <circle cx="0" cy="0" r="118" fill="none" stroke="#ddd8cb" stroke-width="7"/>
+
+    <path d="M 83.44 -83.44 A 118 118 0 0 1 118 0"        fill="none" stroke="#22a35a" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 118 0 A 118 118 0 0 1 0 118"               fill="none" stroke="#2563eb" stroke-width="12" stroke-linecap="round"/>
+    <path d="M -41.72 110.4 A 118 118 0 0 1 -118 0"       fill="none" stroke="#e08700" stroke-width="12" stroke-linecap="round"/>
+    <path d="M -102.19 -59 A 118 118 0 0 1 -59 -102.19"   fill="none" stroke="#c4451f" stroke-width="12" stroke-linecap="round"/>
+    <path d="M -29.5 -114.26 A 118 118 0 0 1 29.5 -114.26" fill="none" stroke="#7c3aed" stroke-width="12" stroke-linecap="round"/>
+
+    <g stroke="#b8b2a4" stroke-width="1.5">
+      <line x1="0" y1="-98" x2="0" y2="-106"/>
+      <line x1="98" y1="0" x2="106" y2="0"/>
+      <line x1="0" y1="98" x2="0" y2="106"/>
+      <line x1="-98" y1="0" x2="-106" y2="0"/>
+    </g>
+
+    <text x="0" y="-4" text-anchor="middle" font-size="22" font-weight="600" fill="#1a1917" letter-spacing="-0.5">pUC19</text>
+    <text x="0" y="20" text-anchor="middle" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="12" fill="#797569" letter-spacing="0.5">2,686 bp</text>
+  </g>
+
+  <text x="740" y="522" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="12"
+        font-weight="500" fill="#797569" letter-spacing="1.4">EXAMPLE &#183; pUC19 &#183; CIRCULAR</text>
+
+  <!-- ============ Footer ============ -->
+  <line x1="76" y1="570" x2="1124" y2="570" stroke="#e4e0d6" stroke-width="1"/>
+  <text x="76" y="597" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="12"
+        font-weight="500" fill="#797569" letter-spacing="1.4">MIT LICENSED &#183; NOTHING UPLOADED</text>
+  <text x="1124" y="597" text-anchor="end" font-family="ui-monospace, DejaVu Sans Mono, monospace" font-size="12"
+        font-weight="500" fill="#c4451f" letter-spacing="1.4">plasmidstudio.app</text>
 </svg>

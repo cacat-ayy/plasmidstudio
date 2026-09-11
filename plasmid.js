@@ -1530,7 +1530,7 @@
       const resolved = seq.length - ambiguous;
       const gc = counts.G + counts.C;
       const at = counts.A + counts.T;
-      const pct = n => resolved > 0 ? (n / resolved * 100).toFixed(1) + '%' : '–';
+      const pct = n => resolved > 0 ? (n / resolved * 100).toFixed(1) + '%' : '-';
 
       html += `<tr><td>GC content</td><td>${pct(gc)}</td></tr>`;
       html += `<tr><td>AT content</td><td>${pct(at)}</td></tr>`;
@@ -4058,7 +4058,7 @@
       }
       else if (labelPos === 'outside') {
         labelR = fR + fTW / 2 + hGap;
-        // Inner ring "outside" labels point toward the backbone — clamp so
+        // Inner ring "outside" labels point toward the backbone, so clamp
         // they don't overlap with inward tick marks
         if ((f.track || 0) < 0 && _tickInnerEdge > 0) {
           const tickFloor = R - trackW / 2 - _tickInnerEdge - hGap;
@@ -6884,8 +6884,8 @@
             pdf.setFillColor(r, g, b);
             pdf.circle(cols[0] + 1, cursorY + 2.5, 1.5, 'F');
 
-            pdf.text(f.name || '–', cols[0] + 5, cursorY + 3.5);
-            pdf.text(f.start + '–' + f.end, cols[1], cursorY + 3.5);
+            pdf.text(f.name || '-', cols[0] + 5, cursorY + 3.5);
+            pdf.text(f.start + '-' + f.end, cols[1], cursorY + 3.5);
             const len = f.end >= f.start ? f.end - f.start + 1 : total - f.start + 1 + f.end;
             pdf.text(len + ' bp', cols[2], cursorY + 3.5);
             pdf.text(f.direction === -1 ? 'Reverse' : 'Forward', cols[3], cursorY + 3.5);
@@ -8312,7 +8312,7 @@
     let html = '';
     filtered.forEach((r, i) => {
       const n = r.sites.length;
-      const posStr = n === 0 ? '<span class="re-none">–</span>' :
+      const posStr = n === 0 ? '<span class="re-none">-</span>' :
         r.sites.map(p => p.toLocaleString()).join(', ');
       const cutClass = n === 0 ? 're-cuts-zero' : n === 1 ? 're-cuts-one' : '';
       const oh = getOverhangInfo(r.enzyme);

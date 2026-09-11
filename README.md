@@ -81,7 +81,7 @@ examples/          Example plasmid maps
 
 ## Coordinates
 
-PlasmidStudio uses **1-based inclusive** coordinates, matching the convention used by Geneious, SnapGene, and GenBank. A feature at positions 100–200 spans 101 base pairs.
+PlasmidStudio uses **1-based inclusive** coordinates, matching the convention used by Geneious, SnapGene, and GenBank. A feature at positions 100-200 spans 101 base pairs.
 
 ## Browser Support
 

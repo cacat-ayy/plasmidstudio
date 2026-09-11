@@ -4,8 +4,8 @@
   "description": "Interactive plasmid map editor for molecular biology",
   "start_url": "/app.html",
   "display": "standalone",
-  "background_color": "#f0f2f5",
-  "theme_color": "#6366f1",
+  "background_color": "#fbfaf7",
+  "theme_color": "#fbfaf7",
   "icons": [
     { "src": "icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

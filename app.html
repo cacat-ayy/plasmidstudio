@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PlasmidStudio – Plasmid Map Editor</title>
+<title>PlasmidStudio: Plasmid Map Editor</title>
 <meta name="description" content="Interactive plasmid map editor. Design circular and linear vector maps, import GenBank files, and export publication-ready SVG, PNG, and PDF.">
 <meta name="keywords" content="plasmid map editor, circular map, linear map, GenBank import, SVG export, molecular cloning, vector design">
 <meta name="author" content="PlasmidStudio">
 <meta name="theme-color" content="#6366f1">
 <script>if(location.protocol!=='file:')document.head.insertAdjacentHTML('beforeend','<link rel="manifest" href="manifest.json">');</script>
 <link rel="canonical" href="https://plasmidstudio.app/app.html">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='12' fill='none' stroke='%236366f1' stroke-width='2.5'/><path d='M8 14a6 6 0 0 1 12 0' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round'/><circle cx='14' cy='14' r='2.5' fill='%236366f1'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='12' fill='none' stroke='%231a1917' stroke-width='2.5'/><path d='M8 14a6 6 0 0 1 12 0' fill='none' stroke='%231a1917' stroke-width='2.5' stroke-linecap='round'/><circle cx='14' cy='14' r='2.5' fill='%23c4451f'/></svg>">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
@@ -18,7 +18,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://plasmidstudio.app/app.html">
-<meta property="og:title" content="PlasmidStudio – Plasmid Map Editor">
+<meta property="og:title" content="PlasmidStudio: Plasmid Map Editor">
 <meta property="og:description" content="Interactive plasmid map editor. Design circular and linear vector maps, import GenBank files, and export publication-ready SVG, PNG, and PDF.">
 <meta property="og:image" content="https://plasmidstudio.app/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -27,7 +27,7 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PlasmidStudio – Plasmid Map Editor">
+<meta name="twitter:title" content="PlasmidStudio: Plasmid Map Editor">
 <meta name="twitter:description" content="Interactive plasmid map editor. Design circular and linear vector maps, import GenBank files, and export publication-ready SVG, PNG, and PDF.">
 <meta name="twitter:image" content="https://plasmidstudio.app/og-image.png">
 
@@ -343,6 +343,11 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
     </button>
     <div class="toolbar-overflow-menu" id="toolbar-overflow-menu"></div>
+    <div class="toolbar-divider"></div>
+    <button id="export-fab" title="Export" aria-label="Export" aria-haspopup="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Export</span>
+    </button>
   </div>
   <div id="plasmid-stats-popover" class="popover stats-popover" role="dialog" aria-label="Plasmid Statistics" style="display:none">
     <div class="popover-header"><span>Plasmid Statistics</span><button id="stats-close" aria-label="Close">&times;</button></div>
@@ -470,7 +475,7 @@
       <div class="info-desc">Interactive plasmid map editor. Build, annotate, and export publication-ready vector maps in your browser.</div>
       <hr>
       <div class="info-row"><span class="info-label">Author</span><span><a href="mailto:contact@plasmidstudio.app" style="color:var(--accent);text-decoration:none">Christopher Acatay</a></span></div>
-      <div class="info-row"><span class="info-label">License</span><span>MIT &ndash; free for any use</span></div>
+      <div class="info-row"><span class="info-label">License</span><span>MIT, free for any use</span></div>
       <hr>
       <div class="info-notice">
         <strong>Free to use.</strong> PlasmidStudio is open-source under the MIT license. All generated figures may be used freely in publications, presentations, theses, and commercial work without restriction or fee.
@@ -797,11 +802,7 @@
     </div>
   </div>
 
-  <!-- Export FAB + popover -->
-  <button id="export-fab" title="Export" aria-label="Export" aria-haspopup="true">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    <span>Export</span>
-  </button>
+  <!-- Export popover (its trigger now lives in the toolbar) -->
   <div id="export-popover" role="dialog" aria-label="Export options">
     <div class="popover-header">
       <span>Export</span>
